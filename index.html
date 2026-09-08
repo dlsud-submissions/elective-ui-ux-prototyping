@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduTrack Analytics — University Student Performance Dashboard</title>
+    <meta
+      name="description"
+      content="EduTrack Analytics is a university student performance dashboard showing GPA trends, performance distribution, and at-risk student tracking."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <div class="app-shell">
+      <!-- ============ SIDEBAR NAVIGATION ============ -->
+      <header class="topbar">
+        <button
+          type="button"
+          class="nav-toggle"
+          id="navToggle"
+          aria-expanded="false"
+          aria-controls="primaryNav"
+        >
+          <span class="nav-toggle-bar" aria-hidden="true"></span>
+          <span class="nav-toggle-bar" aria-hidden="true"></span>
+          <span class="nav-toggle-bar" aria-hidden="true"></span>
+          <span class="sr-only">Toggle navigation menu</span>
+        </button>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">Et</span>
+          <span class="brand-name">EduTrack <em>Analytics</em></span>
+        </div>
+        <div class="topbar-meta">
+          <span class="term-badge">Term: A.Y. 2025–2026, 1st Sem</span>
+        </div>
+      </header>
+
+      <nav class="sidenav" id="primaryNav" aria-label="Primary">
+        <ul class="sidenav-list">
+          <li>
+            <a
+              href="#overview"
+              class="sidenav-link is-active"
+              data-nav="overview"
+            >
+              <span class="icon" aria-hidden="true">&#9673;</span> Overview
+            </a>
+          </li>
+          <li>
+            <a href="#students" class="sidenav-link" data-nav="students">
+              <span class="icon" aria-hidden="true">&#9776;</span> Students
+            </a>
+          </li>
+          <li>
+            <a href="#at-risk" class="sidenav-link" data-nav="at-risk">
+              <span class="icon" aria-hidden="true">&#9888;</span> At-Risk
+            </a>
+          </li>
+          <li>
+            <a href="#insights" class="sidenav-link" data-nav="insights">
+              <span class="icon" aria-hidden="true">&#8776;</span> Insights
+            </a>
+          </li>
+        </ul>
+        <div class="sidenav-footer">
+          <p>Registrar's Office<br />College of Computer Studies</p>
+        </div>
+      </nav>
+
+      <!-- ============ MAIN CONTENT ============ -->
+      <main id="main-content" class="main-content">
+        <!-- OVERVIEW / SUMMARY -->
+        <section
+          id="overview"
+          class="section"
+          aria-labelledby="overview-heading"
+        >
+          <div class="section-head">
+            <div>
+              <h1 id="overview-heading">Performance Overview</h1>
+              <p class="section-sub">
+                Cohort standing across all enrolled students, updated in real
+                time from the latest gradebook sync.
+              </p>
+            </div>
+            <div class="section-actions">
+              <label class="field-label sr-only" for="cohortSelect"
+                >Filter cohort</label
+              >
+              <select id="cohortSelect" class="select-input">
+                <option value="all" selected>All Programs</option>
+                <option value="BSIT">BSIT</option>
+                <option value="BSCS">BSCS</option>
+                <option value="BSPsych">BS Psychology</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="stat-grid" id="statGrid" aria-live="polite">
+            <!-- Populated by JS -->
+          </div>
+
+          <div class="chart-grid">
+            <div class="panel chart-panel">
+              <div class="panel-head">
+                <h2>GPA Trend</h2>
+                <p class="panel-sub">
+                  Cohort average GPA across the current term, tracked monthly.
+                </p>
+              </div>
+              <div
+                class="chart-wrap"
+                id="gpaTrendChart"
+                role="img"
+                aria-label="Line chart showing the cohort average GPA trend across the term. Detailed values are listed below the chart."
+              >
+                <!-- SVG injected by JS -->
+              </div>
+              <table class="visually-hidden-table">
+                <caption>
+                  GPA trend data by month
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Month</th>
+                    <th scope="col">Average GPA</th>
+                  </tr>
+                </thead>
+                <tbody id="gpaTrendTableBody"></tbody>
+              </table>
+            </div>
+
+            <div class="panel chart-panel">
+              <div class="panel-head">
+                <h2>Performance Distribution</h2>
+                <p class="panel-sub">
+                  Share of students in each performance band, this term.
+                </p>
+              </div>
+              <div
+                class="chart-wrap"
+                id="distributionChart"
+                role="img"
+                aria-label="Donut chart showing the share of students in each performance band. Detailed values are listed below the chart."
+              >
+                <!-- SVG injected by JS -->
+              </div>
+              <table class="visually-hidden-table">
+                <caption>
+                  Performance distribution data
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Band</th>
+                    <th scope="col">Student count</th>
+                  </tr>
+                </thead>
+                <tbody id="distributionTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- STUDENTS TABLE -->
+        <section
+          id="students"
+          class="section"
+          aria-labelledby="students-heading"
+        >
+          <div class="section-head">
+            <div>
+              <h2 id="students-heading">Student Roster</h2>
+              <p class="section-sub">
+                Search, filter, and open a full record for any student in the
+                cohort.
+              </p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="table-controls">
+              <div class="field">
+                <label for="studentSearch">Search students</label>
+                <input
+                  type="search"
+                  id="studentSearch"
+                  placeholder="Search by name or student ID…"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="field">
+                <label for="performanceFilter">Performance band</label>
+                <select id="performanceFilter" class="select-input">
+                  <option value="all" selected>All bands</option>
+                  <option value="Excellent">Excellent</option>
+                  <option value="Good">Good</option>
+                  <option value="Average">Average</option>
+                  <option value="At Risk">At Risk</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="sortSelect">Sort by</label>
+                <select id="sortSelect" class="select-input">
+                  <option value="name-asc" selected>Name (A–Z)</option>
+                  <option value="gpa-desc">GPA (High–Low)</option>
+                  <option value="gpa-asc">GPA (Low–High)</option>
+                  <option value="attendance-asc">Attendance (Low–High)</option>
+                </select>
+              </div>
+            </div>
+
+            <p class="result-count" id="resultCount" aria-live="polite"></p>
+
+            <div class="table-scroll">
+              <table class="student-table">
+                <caption class="sr-only">
+                  Student performance roster, searchable and filterable
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Student</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Program</th>
+                    <th scope="col">GPA</th>
+                    <th scope="col">Attendance</th>
+                    <th scope="col">Assignments</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="sr-only">Details</span></th>
+                  </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+            <p class="empty-state" id="emptyState" hidden>
+              No students match your search and filter selection.
+            </p>
+          </div>
+        </section>
+
+        <!-- AT-RISK -->
+        <section id="at-risk" class="section" aria-labelledby="at-risk-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="at-risk-heading">At-Risk Students</h2>
+              <p class="section-sub">
+                Flagged automatically when GPA falls below 2.00 or attendance
+                drops under 75%.
+              </p>
+            </div>
+            <span class="risk-count-badge" id="riskCountBadge">0 flagged</span>
+          </div>
+
+          <div class="at-risk-grid" id="atRiskGrid" aria-live="polite">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- INSIGHTS / NOTES -->
+        <section
+          id="insights"
+          class="section"
+          aria-labelledby="insights-heading"
+        >
+          <div class="section-head">
+            <div>
+              <h2 id="insights-heading">Advisory Notes</h2>
+              <p class="section-sub">
+                Automated summary generated from current cohort figures.
+              </p>
+            </div>
+          </div>
+          <div class="panel insights-panel" id="insightsPanel">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <footer class="app-footer">
+          <p>
+            EduTrack Analytics — prototype dashboard for internal registrar use.
+            Data shown is fictional and generated locally for demonstration.
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <!-- ============ STUDENT DETAIL MODAL ============ -->
+    <div class="modal-overlay" id="modalOverlay" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        id="studentModal"
+        aria-modal="true"
+        aria-labelledby="modalStudentName"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="modal-close"
+          id="modalClose"
+          aria-label="Close student details"
+        >
+          &times;
+        </button>
+
+        <div class="modal-header">
+          <div class="modal-avatar" id="modalAvatar" aria-hidden="true"></div>
+          <div>
+            <h2 id="modalStudentName">Student Name</h2>
+            <p class="modal-subline" id="modalStudentMeta">
+              Program • Year Level • ID
+            </p>
+          </div>
+          <span class="status-pill" id="modalStatusPill">Status</span>
+        </div>
+
+        <dl class="modal-stats">
+          <div>
+            <dt>GPA</dt>
+            <dd id="modalGpa">0.00</dd>
+          </div>
+          <div>
+            <dt>Attendance</dt>
+            <dd id="modalAttendance">0%</dd>
+          </div>
+          <div>
+            <dt>Assignments completed</dt>
+            <dd id="modalAssignments">0%</dd>
+          </div>
+          <div>
+            <dt>Units enrolled</dt>
+            <dd id="modalUnits">0</dd>
+          </div>
+        </dl>
+
+        <div class="modal-section">
+          <h3>Course standing</h3>
+          <ul class="course-list" id="modalCourseList"></ul>
+        </div>
+
+        <div class="modal-section" id="modalAdvisoryWrap">
+          <h3>Advisory note</h3>
+          <p id="modalAdvisory"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="liveRegion" class="sr-only" role="status" aria-live="polite"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
