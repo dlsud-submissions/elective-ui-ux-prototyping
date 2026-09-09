@@ -348,6 +348,13 @@ select:focus-visible,
   margin-top: 4px;
 }
 
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .select-input,
 input[type="search"],
 input[type="text"] {
@@ -452,6 +459,12 @@ input:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
+}
+
+.chart-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* allow SVG to shrink inside the grid track instead of overflowing */
 }
 
 .panel-head {
@@ -609,8 +622,7 @@ input:hover {
   background: var(--warn-soft);
   color: var(--warn);
 }
-.status-pill.At-Risk,
-.status-pill[data-status="At Risk"] {
+.status-pill.At-Risk {
   background: var(--risk-soft);
   color: var(--risk);
 }

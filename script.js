@@ -224,12 +224,23 @@
   function generateGpaTrend(students) {
     const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep"];
     const currentAvg = average(students.map((s) => s.gpa));
+
+    // Use a RNG seeded from the current dataset (not the shared global stream)
+    // so the trend line is stable across re-renders of the same filter
+    // instead of reshuffling every time a control changes.
+    const seed = Math.max(
+      1,
+      Math.round((currentAvg * 1000 + students.length) * 97),
+    );
+    const localRand = makeSeededRandom(seed);
+    const localRange = (min, max) => min + localRand() * (max - min);
+
     // Walk backwards from current average with small plausible variance
     const trend = [];
     let value = currentAvg;
     for (let i = months.length - 1; i >= 0; i--) {
       trend[i] = { month: months[i], gpa: +value.toFixed(2) };
-      value = value - randRange(-0.08, 0.14);
+      value = value - localRange(-0.08, 0.14);
       value = Math.max(2.2, Math.min(3.9, value));
     }
     return trend;
@@ -307,10 +318,18 @@
       {
         label: "At-Risk Students",
         value: String(stats.atRiskCount),
-        delta: `${((stats.atRiskCount / stats.total) * 100).toFixed(0)}% of cohort`,
+        delta:
+          stats.total > 0
+            ? `${((stats.atRiskCount / stats.total) * 100).toFixed(0)}% of cohort`
+            : "No data",
         deltaClass: stats.atRiskCount > 0 ? "is-down" : "is-flat",
       },
     ];
+
+    if (stats.total === 0) {
+      statGrid.innerHTML = `<p class="empty-state">No students match the selected program filter.</p>`;
+      return;
+    }
 
     cards.forEach((c) => {
       const card = document.createElement("article");
@@ -328,6 +347,11 @@
      6. Rendering: GPA trend line chart (hand-built SVG)
      --------------------------------------------------------- */
   function renderGpaTrend(students) {
+    if (students.length === 0) {
+      gpaTrendChart.innerHTML = `<p class="empty-state">No data for the selected program.</p>`;
+      gpaTrendTableBody.innerHTML = "";
+      return;
+    }
     const data = generateGpaTrend(students);
     const width = 520,
       height = 220,
@@ -391,6 +415,11 @@
   };
 
   function renderDistribution(students) {
+    if (students.length === 0) {
+      distributionChart.innerHTML = `<p class="empty-state">No data for the selected program.</p>`;
+      distributionTableBody.innerHTML = "";
+      return;
+    }
     const bands = ["Excellent", "Good", "Average", "At Risk"];
     const counts = bands.map(
       (b) => students.filter((s) => s.status === b).length,
